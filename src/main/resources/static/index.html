@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tic-Tac-Toe Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .game-container {
+            text-align: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .game-info {
+            margin: 20px 0;
+            font-size: 1.2em;
+        }
+
+        .current-player {
+            font-weight: bold;
+            color: #FFD700;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            width: 300px;
+            height: 300px;
+            margin: 20px auto;
+            background: #333;
+            border-radius: 10px;
+            padding: 5px;
+        }
+
+        .cell {
+            background: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 2.5em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cell:hover:not(:disabled) {
+            background: #f0f0f0;
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .cell:disabled {
+            cursor: not-allowed;
+        }
+
+        .cell.x {
+            color: #ff6b6b;
+            animation: popIn 0.3s ease-out;
+        }
+
+        .cell.o {
+            color: #4ecdc4;
+            animation: popIn 0.3s ease-out;
+        }
+
+        .cell.winning {
+            background: linear-gradient(45deg, #FFD700, #FFA500);
+            animation: winningCell 0.6s ease-in-out;
+        }
+
+        @keyframes popIn {
+            0% {
+                transform: scale(0.5);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1.2);
+            }
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        @keyframes winningCell {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+        }
+
+        .controls {
+            margin: 20px 0;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #ff6b6b, #ff8e53);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: bold;
+            cursor: pointer;
+            margin: 0 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn.secondary {
+            background: linear-gradient(45deg, #4ecdc4, #44a08d);
+        }
+
+        .game-status {
+            font-size: 1.3em;
+            margin: 15px 0;
+            min-height: 30px;
+        }
+
+        .winner-announcement {
+            color: #FFD700;
+            font-weight: bold;
+            animation: celebrate 1s ease-in-out;
+        }
+
+        .draw-announcement {
+            color: #FFA500;
+            font-weight: bold;
+        }
+
+        @keyframes celebrate {
+            0%, 100% {
+                transform: scale(1);
+            }
+            25% {
+                transform: scale(1.1) rotate(-5deg);
+            }
+            75% {
+                transform: scale(1.1) rotate(5deg);
+            }
+        }
+
+        .player-selection {
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .player-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .player-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px solid white;
+            background: transparent;
+            color: white;
+            font-size: 1.5em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .player-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .player-btn.selected {
+            background: #FFD700;
+            color: #333;
+            border-color: #FFD700;
+        }
+
+        .score-board {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px 0;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+        }
+
+        .score-item {
+            text-align: center;
+        }
+
+        .score-label {
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .score-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .loading {
+            opacity: 0.6;
+            pointer-events: none;
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            border: 1px solid rgba(255, 107, 107, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🎮 Tic-Tac-Toe</h1>
+        
+        <div class="player-selection" id="playerSelection">
+            <h3>Choose Your Symbol</h3>
+            <div class="player-buttons">
+                <button class="player-btn selected" id="chooseX" onclick="selectPlayer('X')">X</button>
+                <button class="player-btn" id="chooseO" onclick="selectPlayer('O')">O</button>
+            </div>
+        </div>
+
+        <div class="score-board">
+            <div class="score-item">
+                <div class="score-label">Player X</div>
+                <div class="score-value" id="scoreX">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">Draws</div>
+                <div class="score-value" id="scoreDraw">0</div>
+            </div>
+            <div class="score-item">
+                <div class="score-label">Player O</div>
+                <div class="score-value" id="scoreO">0</div>
+            </div>
+        </div>
+
+        <div class="game-info">
+            <div class="current-player">Current Player: <span id="currentPlayer">X</span></div>
+        </div>
+
+        <div class="game-board" id="gameBoard">
+            <button class="cell" id="cell-0" onclick="makeMove(0)"></button>
+            <button class="cell" id="cell-1" onclick="makeMove(1)"></button>
+            <button class="cell" id="cell-2" onclick="makeMove(2)"></button>
+            <button class="cell" id="cell-3" onclick="makeMove(3)"></button>
+            <button class="cell" id="cell-4" onclick="makeMove(4)"></button>
+            <button class="cell" id="cell-5" onclick="makeMove(5)"></button>
+            <button class="cell" id="cell-6" onclick="makeMove(6)"></button>
+            <button class="cell" id="cell-7" onclick="makeMove(7)"></button>
+            <button class="cell" id="cell-8" onclick="makeMove(8)"></button>
+        </div>
+
+        <div class="game-status" id="gameStatus"></div>
+
+        <div class="controls">
+            <button class="btn" onclick="startNewGame()">New Game</button>
+            <button class="btn secondary" onclick="resetScores()">Reset Scores</button>
+        </div>
+
+        <div id="errorMessage" class="error-message" style="display: none;"></div>
+    </div>
+
+    <script>
+        let gameId = null;
+        let playerSymbol = 'X';
+        let gameState = {
+            board: Array(9).fill(''),
+            currentPlayer: 'X',
+            gameOver: false,
+            winner: null,
+            winningLine: null
+        };
+
+        // Score tracking
+        let scores = {
+            X: 0,
+            O: 0,
+            draw: 0
+        };
+
+        // Load scores from memory
+        function loadScores() {
+            const savedScores = sessionStorage.getItem('ticTacToeScores');
+            if (savedScores) {
+                scores = JSON.parse(savedScores);
+                updateScoreDisplay();
+            }
+        }
+
+        // Save scores to memory
+        function saveScores() {
+            sessionStorage.setItem('ticTacToeScores', JSON.stringify(scores));
+        }
+
+        function selectPlayer(symbol) {
+            playerSymbol = symbol;
+            document.getElementById('chooseX').classList.toggle('selected', symbol === 'X');
+            document.getElementById('chooseO').classList.toggle('selected', symbol === 'O');
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.style.display = 'block';
+            setTimeout(() => {
+                errorDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        function setLoading(loading) {
+            const container = document.querySelector('.game-container');
+            container.classList.toggle('loading', loading);
+        }
+
+        async function startNewGame() {
+            try {
+                setLoading(true);
+                const response = await fetch('/api/game/start', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to start game');
+                }
+
+                const data = await response.json();
+                gameId = data.gameId;
+                gameState = {
+                    board: data.board,
+                    currentPlayer: data.currentPlayer,
+                    gameOver: data.gameOver,
+                    winner: data.winner,
+                    winningLine: null
+                };
+
+                updateUI();
+                playSound('start');
+            } catch (error) {
+                console.error('Error starting game:', error);
+                showError('Failed to start new game. Please try again.');
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        async function makeMove(position) {
+            if (!gameId || gameState.gameOver || gameState.board[position] !== '' || 
+                gameState.currentPlayer !== playerSymbol) {
+                return;
+            }
+
+            try {
+                setLoading(true);
+                const response = await fetch(`/api/game/${gameId}/move`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        position: position,
+                        player: playerSymbol
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || 'Invalid move');
+                }
+
+                const data = await response.json();
+                gameState = data;
+                updateUI();
+                playSound('move');
+
+                // Check if game ended
+                if (gameState.gameOver) {
+                    setTimeout(() => {
+                        if (gameState.winner) {
+                            scores[gameState.winner]++;
+                            playSound('win');
+                        } else {
+                            scores.draw++;
+                            playSound('draw');
+                        }
+                        updateScoreDisplay();
+                        saveScores();
+                    }, 500);
+                }
+
+                // AI move (simple random AI when playing against computer)
+                if (!gameState.gameOver && gameState.currentPlayer !== playerSymbol) {
+                    setTimeout(makeAIMove, 800);
+                }
+
+            } catch (error) {
+                console.error('Error making move:', error);
+                showError(error.message);
+            } finally {
+                setLoading(false);
+            }
+        }
+
+        async function makeAIMove() {
+            if (gameState.gameOver) return;
+
+            // Simple AI: find empty cells and pick randomly
+            const emptyCells = gameState.board
+                .map((cell, index) => cell === '' ? index : null)
+                .filter(index => index !== null);
+
+            if (emptyCells.length === 0) return;
+
+            const randomIndex = emptyCells[Math.floor(Math.random() * emptyCells.length)];
+            const aiSymbol = playerSymbol === 'X' ? 'O' : 'X';
+
+            try {
+                const response = await fetch(`/api/game/${gameId}/move`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        position: randomIndex,
+                        player: aiSymbol
+                    })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    gameState = data;
+                    updateUI();
+                    playSound('move');
+
+                    if (gameState.gameOver) {
+                        setTimeout(() => {
+                            if (gameState.winner) {
+                                scores[gameState.winner]++;
+                                playSound(gameState.winner === playerSymbol ? 'win' : 'lose');
+                            } else {
+                                scores.draw++;
+                                playSound('draw');
+                            }
+                            updateScoreDisplay();
+                            saveScores();
+                        }, 500);
+                    }
+                }
+            } catch (error) {
+                console.error('AI move error:', error);
+            }
+        }
+
+        function updateUI() {
+            // Update board
+            for (let i = 0; i < 9; i++) {
+                const cell = document.getElementById(`cell-${i}`);
+                cell.textContent = gameState.board[i];
+                cell.className = 'cell';
+                
+                if (gameState.board[i]) {
+                    cell.classList.add(gameState.board[i].toLowerCase());
+                    cell.disabled = true;
+                } else {
+                    cell.disabled = gameState.gameOver || gameState.currentPlayer !== playerSymbol;
+                }
+            }
+
+            // Highlight winning line
+            if (gameState.winningLine) {
+                gameState.winningLine.forEach(index => {
+                    document.getElementById(`cell-${index}`).classList.add('winning');
+                });
+            }
+
+            // Update current player
+            document.getElementById('currentPlayer').textContent = gameState.currentPlayer;
+
+            // Update game status
+            const statusElement = document.getElementById('gameStatus');
+            if (gameState.gameOver) {
+                if (gameState.winner) {
+                    statusElement.innerHTML = `<div class="winner-announcement">🎉 Player ${gameState.winner} Wins! 🎉</div>`;
+                } else {
+                    statusElement.innerHTML = `<div class="draw-announcement">🤝 It's a Draw! 🤝</div>`;
+                }
+            } else {
+                statusElement.textContent = '';
+            }
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('scoreX').textContent = scores.X;
+            document.getElementById('scoreO').textContent = scores.O;
+            document.getElementById('scoreDraw').textContent = scores.draw;
+        }
+
+        function resetScores() {
+            scores = { X: 0, O: 0, draw: 0 };
+            updateScoreDisplay();
+            saveScores();
+            playSound('reset');
+        }
+
+        function playSound(type) {
+            // Create audio context for sound effects
+            try {
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                let frequency, duration;
+
+                switch (type) {
+                    case 'move':
+                        frequency = 800;
+                        duration = 0.1;
+                        break;
+                    case 'win':
+                        frequency = 1000;
+                        duration = 0.3;
+                        break;
+                    case 'lose':
+                        frequency = 400;
+                        duration = 0.3;
+                        break;
+                    case 'draw':
+                        frequency = 600;
+                        duration = 0.2;
+                        break;
+                    case 'start':
+                    case 'reset':
+                        frequency = 500;
+                        duration = 0.15;
+                        break;
+                    default:
+                        return;
+                }
+
+                const oscillator = audioContext.createOscillator();
+                const gainNode = audioContext.createGain();
+
+                oscillator.connect(gainNode);
+                gainNode.connect(audioContext.destination);
+
+                oscillator.frequency.value = frequency;
+                oscillator.type = 'sine';
+
+                gainNode.gain.setValueAtTime(0.1, audioContext.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + duration);
+
+                oscillator.start(audioContext.currentTime);
+                oscillator.stop(audioContext.currentTime + duration);
+            } catch (error) {
+                // Silently fail if audio context is not supported
+                console.log('Audio not supported');
+            }
+        }
+
+        // Initialize game on page load
+        window.addEventListener('load', () => {
+            loadScores();
+            startNewGame();
+        });
+    </script>
+</body>
+</html>
