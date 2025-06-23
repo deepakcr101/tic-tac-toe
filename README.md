@@ -30,7 +30,7 @@ A clean and responsive Tic-Tac-Toe game built with **Spring Boot** (Java backend
 
 | Home Screen | Gameplay | Game Over |
 |-------------|----------|-----------|
-| ![home](src/main/resources/static/images/Game Home.png) | ![gameplay](src/main/resources/static/images/Game Play.png) | ![gameover](src/main/resources/static/images/Game Result.png) |
+| ![home](src/main/resources/static/images/Game%20Home.png) | ![gameplay](src/main/resources/static/images/Game%20Play.png) | ![gameover](src/main/resources/static/images/Game%20Result.png) |
 
 ---
 
